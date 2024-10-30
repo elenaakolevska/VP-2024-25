@@ -1,0 +1,58 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <title>Event Booking page - Welcome and choose an Event</title>
+    <style type="text/css">
+        body {
+            width: 800px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Welcome to our Event Booking App</h1>
+</header>
+<main>
+    <form action="/" method="get">
+    <label for="searchName">Event Name:</label>
+        <input type="text" name="searchName" id="searchName" placeholder="Search an event">
+        <br/>
+        <label for="minRating">Minimum Rating Of Event:</label>
+        <input type="number" name="minRating" id="minRating" min="0" max="10" placeholder="Min Rating">
+        <br/>
+        <input type="submit" value="Submit">
+    </form>
+
+
+    <h2>Choose an event:</h2>
+    <form th:action="@{/eventBooking}" th:method="post">
+       <div th:each="event : ${events}">
+           <input type="radio" id="radio" name="eventName" th:value="${event.name}">
+           <span>
+               <b>Name: </b><th:block th:text="${event.getName()}"></th:block> </br>
+               <b>Description: </b><th:block th:text="${event.getDescription()}"></th:block> </br>
+               <b>Rating: </b><th:block th:text="${event.getPopularityScore()}"></th:block>
+           </span>
+            </br>
+           </br>
+       </div>
+
+
+    <h2>Choose number of tickets:</h2>          <input type="number" name="numOfTickets" min="1" max="10"><br/>
+
+
+        <br/>
+
+    Attendee Name: <input type="text" name="attendeeName" th:value="${attendeeName}"><br/>
+
+    IP Address: <span th:text="${clientIpAddress}"></span><br/>
+
+
+    <br/>
+    <input type="submit" value="Submit">
+
+    </form>
+</main>
+</body>
+</html>
