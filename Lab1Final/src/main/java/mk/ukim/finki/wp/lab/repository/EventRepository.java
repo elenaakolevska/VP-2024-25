@@ -1,5 +1,6 @@
 package mk.ukim.finki.wp.lab.repository;
 
+
 import mk.ukim.finki.wp.lab.bootstrap.DataHolder;
 import mk.ukim.finki.wp.lab.model.Event;
 import mk.ukim.finki.wp.lab.model.SavedBooking;
@@ -7,47 +8,59 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
 public class EventRepository {
+    private final List<SavedBooking> savedBookings = new ArrayList<>();
 
-    //direktno komunicira so datata na podatoci
-    //imame nekoja logika odnosno prebaruvanje po nesto
-
-
-    private List<SavedBooking> savedBookings = new ArrayList<>();
     public List<Event> findAll() {
         return DataHolder.eventList;
     }
 
-    public List<Event> searchEvents(String text, double popularityScore){
-        return DataHolder.eventList
-                .stream()
-                .filter(event -> (text == null || text.isEmpty() || event.getName().toLowerCase().contains(text.toLowerCase()) ||
-                        event.getDescription().toLowerCase().contains(text.toLowerCase())) &&
-                        event.getPopularityScore() >= popularityScore)
+
+    public boolean bookTickets(String eventName, int ticketsToBook) throws IllegalArgumentException {
+        Optional<Event> event = DataHolder.eventList.stream()
+                .filter(e -> e.getName().equals(eventName))
+                .findFirst();
+
+        if (event.isPresent()) {
+            Event currentEvent = event.get();
+            if (ticketsToBook <= 0) {
+                throw new IllegalArgumentException("Number of tickets must be positive.");
+            }
+            if (ticketsToBook > currentEvent.getTicketCount()) {
+                throw new IllegalArgumentException("The limit of tickets has been reached");
+            }
+            currentEvent.setTicketCount(currentEvent.getTicketCount() - ticketsToBook);
+            return true;
+        } else {
+            throw new IllegalArgumentException("Event not found.");
+        }
+    }
+
+    public List<Event> searchEvents(String text, double popularity) {
+        return DataHolder.eventList.stream()
+                .filter(event -> (text == null || text.isEmpty() || event.getName().contains(text)
+                        || event.getDescription().contains(text)) && event.getPopularityScore() >= popularity)
                 .collect(Collectors.toList());
     }
 
-    public List<SavedBooking> getSavedBookings(){
-        return savedBookings;
-    }
-
-    public void addBooking(String eventName, String numTickets) {
+    public void addBooking(String eventName, String attendeeName, int tickets) {
+        bookTickets(eventName, tickets);
         boolean bookingExists = false;
 
         for (SavedBooking booking : savedBookings) {
-            if(booking.getEventName().equals(eventName)){
-                booking.setNumberOfTickets(booking.getNumberOfTickets() + numTickets);
-                bookingExists=true;
+            if (booking.getEventName().equals(eventName) && booking.getAttendeeName().equals(attendeeName)) {
+                booking.setNumberOfTickets(booking.getNumberOfTickets() + tickets);
+                bookingExists = true;
                 break;
             }
         }
 
-        if(!bookingExists){
-            savedBookings.add(new SavedBooking(eventName, numTickets));
+        if (!bookingExists) {
+            savedBookings.add(new SavedBooking(eventName, attendeeName, tickets));
         }
-
     }
 }

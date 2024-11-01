@@ -21,54 +21,50 @@ import java.util.List;
 
 import static mk.ukim.finki.wp.lab.bootstrap.DataHolder.eventList;
 
-@WebServlet(name = "EventListServlet", urlPatterns = "/*")
-
+@WebServlet(name="eventlist-servlet",urlPatterns = "/*")
 public class EventListServlet extends HttpServlet {
+    private final  EventService eventService;
 
-    //proess thymeleaf template
+    //    process thymeleaf templates
+//    This enables server-side generation of HTML with data injected into the view.
     private final SpringTemplateEngine springTemplateEngine;
-    private final   EventService eventService;
 
-    public EventListServlet(SpringTemplateEngine springTemplateEngine, EventService eventService) {
-        this.springTemplateEngine = springTemplateEngine;
+    public EventListServlet(EventService eventService, SpringTemplateEngine springTemplateEngine) {
         this.eventService = eventService;
+        this.springTemplateEngine = springTemplateEngine;
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        IWebExchange iWebExchange = JakartaServletWebApplication
-                .buildApplication(req.getServletContext())
+        IWebExchange webExchange = JakartaServletWebApplication
+                .buildApplication(getServletContext())
                 .buildExchange(req, resp);
-        WebContext webContext = new WebContext(iWebExchange);
 
         List<Event> events;
-
-      //  events= DataHolder.eventList;
+//        events=DataHolder.events;
 
         String searchName = req.getParameter("searchName");
-        String minRating = req.getParameter("minRating");
+        String minRatingParam = req.getParameter("minRating");
 
-        if((searchName == null || searchName.isEmpty()) &&
-                ( minRating == null || minRating.isEmpty())){
-            events = eventService.listAll();
-        }else {
-            double minRatingValue = 0.0;
-            if (minRating != null && !minRating.isEmpty()) {
-                minRatingValue = Double.parseDouble(minRating);
-            }
-            events = eventService.searchEvents(searchName, minRatingValue);
+        if((searchName==null||searchName.isEmpty())&&(minRatingParam==null || minRatingParam.isEmpty()) ){
+            events=eventService.listAll();
+        }
+        else{
+            double minRating = minRatingParam != null && !minRatingParam.isEmpty() ? Double.parseDouble(minRatingParam) : 0.0;
+            events=eventService.searchEvents(searchName,minRating);
         }
 
-
-
+        WebContext context = new WebContext(webExchange, req.getLocale());
+        //for search
+        context.setVariable("searchName", searchName);
+        context.setVariable("minRating", minRatingParam);
+        context.setVariable("events", events);
+        //for listing
         String clientIpAddress = req.getRemoteAddr();
-        webContext.setVariable("clientIpAddress", clientIpAddress);
-        webContext.setVariable("events", events);
-        springTemplateEngine.process("listEvents.html", webContext, resp.getWriter());
-
-
-
+        context.setVariable("clientIpAddress", clientIpAddress);
+        context.setVariable("events", events);
+        springTemplateEngine.process("listEvents.html", context, resp.getWriter());
     }
 
     @Override

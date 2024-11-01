@@ -17,14 +17,11 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-
-@WebServlet(name="eventBookingServlet", urlPatterns = "/eventBooking")
+@WebServlet(name = "event-booking", urlPatterns = "/eventBooking")
 public class EventBookingServlet extends HttpServlet {
-
     private final SpringTemplateEngine springTemplateEngine;
     private final EventBookingService bookingService;
     private final EventService eventService;
-
 
     public EventBookingServlet(SpringTemplateEngine springTemplateEngine, EventBookingService bookingService, EventService eventService) {
         this.springTemplateEngine = springTemplateEngine;
@@ -34,35 +31,24 @@ public class EventBookingServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String newString = req.getParameter("bookingSearch");
 
-        List<SavedBooking> bookingsToSend = eventService.getSavedBookings()
-                .stream()
-                .filter(booking -> booking.getEventName().toLowerCase().contains(newString.toLowerCase()))
-                .collect(Collectors.toList());
-
-        IWebExchange iWebExchange = JakartaServletWebApplication.buildApplication(req.getServletContext()).buildExchange(req, resp);
-        WebContext context = new WebContext(iWebExchange);
-        context.setVariable("savedBookingList", bookingsToSend);
-        springTemplateEngine.process("bookingConfirmation.html", context, resp.getWriter());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        IWebExchange webExchange = JakartaServletWebApplication.buildApplication(getServletContext()).buildExchange(req, resp);
 
-        IWebExchange iWebExchange = JakartaServletWebApplication.buildApplication(req.getServletContext()).buildExchange(req, resp);
-        WebContext context = new WebContext(iWebExchange);
-
-        //se zema od listEvents.html
+        WebContext context = new WebContext(webExchange, req.getLocale());
         String eventName = req.getParameter("eventName");
-        String attendeeName = req.getParameter("attendeeName");
+        String attendeeName = req.getParameter("nameAttendee");
         String attendeeAddress = req.getRemoteAddr();
-        int numOfTickets = Integer.parseInt(req.getParameter("numOfTickets"));
+        int numberOfTickets = Integer.parseInt(req.getParameter("numTickets"));
 
-        EventBooking booking = bookingService.placeBooking(eventName, attendeeName, attendeeAddress, numOfTickets);
+        EventBooking booking = bookingService.placeBooking(eventName, attendeeName, attendeeAddress, numberOfTickets);
         context.setVariable("booking", booking);
 
-        springTemplateEngine.process("bookingConfirmation.html", context, resp.getWriter());
 
+        springTemplateEngine.process("bookingConfirmation.html", context, resp.getWriter());
     }
+
 }

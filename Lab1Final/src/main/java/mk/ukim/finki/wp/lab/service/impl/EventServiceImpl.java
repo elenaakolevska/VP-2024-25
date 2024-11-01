@@ -10,7 +10,6 @@ import java.util.List;
 
 @Service
 public class EventServiceImpl implements EventService {
-
     private final EventRepository eventRepository;
 
     public EventServiceImpl(EventRepository eventRepository) {
@@ -23,17 +22,20 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<Event> searchEvents(String text,double popularityScore) {
-        return eventRepository.searchEvents(text, popularityScore);
+    public List<Event> searchEvents(String text,double popularity) {
+        return eventRepository.searchEvents(text,popularity);
     }
 
-    @Override
-    public List<SavedBooking> getSavedBookings() {
-        return eventRepository.getSavedBookings();
-    }
+
 
     @Override
-    public void addBooking(String eventName, String numTickets) {
-        eventRepository.addBooking(eventName, numTickets);
+    public void addBooking(String eventName, String attendeeName, int tickets) {
+        try {
+            eventRepository.addBooking(eventName, attendeeName, tickets);
+        } catch (IllegalArgumentException e) {
+
+            throw new RuntimeException("Booking failed: " + e.getMessage(), e);
+        }
     }
+
 }
