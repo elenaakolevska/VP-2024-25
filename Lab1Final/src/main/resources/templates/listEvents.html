@@ -2,64 +2,240 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>Event Booking page - Welcome and choose an Event</title>
+    <title>Event Booking Page - Welcome and Choose an Event</title>
     <style type="text/css">
         body {
-            width: 800px;
-            margin: auto;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
+
+
+        header h1 {
+            text-align: center;
+            color: #8a6e58;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #8a6e58;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 1.1rem;
+            color: #8a6e58;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"], input[type="number"], input[type="submit"] {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 10px 0;
+            border: 2px solid #8a6e58;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #fff;
+        }
+
+        input[type="submit"] {
+            background-color: #8a6e58;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #7a5b45;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 8px;
+        }
+
+        .btn-edit {
+            background-color: #8a6e58;
+            border-color: #8a6e58;
+            margin-right: 10px;
+        }
+
+        .btn-edit:hover {
+            background-color: #7a5b45;
+            border-color: #7a5b45;
+        }
+
+        .btn-delete {
+            background-color: #d16f5b;
+            border-color: #d16f5b;
+        }
+
+        .btn-delete:hover {
+            background-color: #c45e4b;
+            border-color: #c45e4b;
+        }
+
+        .btn-delete-custom {
+            background-color: #c45e4b; /* Custom background color */
+            border-color: #c45e4b; /* Custom border color */
+        }
+
+        .btn-delete-custom:hover {
+            background-color: #b14b3a; /* Darker shade for hover */
+            border-color: #b14b3a; /* Darker border color for hover */
+        }
+
+        .event-info {
+            background-color: #faf9f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .event-info b {
+            color: #8a6e58;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container label {
+            color: #8a6e58;
+        }
+
+        .form-container input[type="number"] {
+            width: auto;
+            display: inline-block;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+        #clientIpAddress {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #8a6e58;
+            background-color: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #8a6e58;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .btn-add-event {
+            background-color: #8a6e58; /* Same as edit button color */
+            border-color: #8a6e58;
+            color: white;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-add-event:hover {
+            background-color: #7a5b45; /* Darker shade on hover */
+            border-color: #7a5b45;
+        }
+
+        .btn-add-event i {
+            margin-right: 5px;}
+
+
     </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/e59232f0a1.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <header>
     <h1>Welcome to our Event Booking App</h1>
 </header>
 <main>
+    <div class="form-container">
+        <h2>Search for an Event</h2>
+        <form action="/" method="get">
+            <label for='search'>By event name:</label>
+            <input type="text" name="searchName" id="search" placeholder="Search an event" th:value="${searchName != null ? searchName : ''}">
+            <label for='minRating'>By minimum rating:</label>
+            <input type='number' name="minRating" id="minRating" placeholder="Search by rating" th:value="${minRating != null ? minRating : ''}">
+            <input type="submit" value="Search">
+        </form>
+    </div>
 
-    <h2>Search an event</h2>
+    <a th:href="@{'/events/add-event'}" class="btn btn-sm btn-add-event">
+        <i class="fa fa-plus"></i> Add Event
+    </a>
+    <div class="form-container">
+        <h2>Choose an Event:</h2>
+        <form action="/eventBooking" th:method="post">
+            <div th:each="event : ${events}">
+                <label>
+                    <input type="radio" th:value="${event.name}" name="eventName">
+                    <div class="event-info">
+                        <b>Name:</b> <span th:text="${event.name}"></span><br>
+                        <b>Description:</b> <span th:text="${event.description}"></span><br>
+                        <b>Rating:</b> <span th:text="${event.popularityScore}"></span><br>
+                        <b>Location:</b> <span th:text="${event.getLocation().name}"></span><br>
+                    </div>
 
-    <form action="/" method="get">
-        <label for='search'>By event name:</label>
-        <input type="text" name="searchName" id="search" placeholder="Search an event"
-               th:value="${searchName != null ? searchName : ''}">
-        <br/>
-        <label for='minRating'>By minimum rating:</label>
-        <input type='number' name="minRating" id="minRating" placeholder="Search by rating"
-               th:value="${minRating != null ? minRating : ''}">
-        <br/>
-        <input type="submit" value="Submit">
-    </form>
+                    <div class="form-actions">
+                        <a th:href="@{'/events/edit/{id}' (id=${event.getId()})}" class="btn btn-sm btn-edit">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+                        <form th:action="@{'/events/delete/{id}' (id=${event.getId()})}" th:method="delete" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-delete-custom">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </label>
+            </div>
 
+            <h2>Choose Number of Tickets:</h2>
+            <input type="number" name="numTickets" min="1" max="10"><br/>
+            <br/>
+            <label for="nameAttendee">Name of booking:</label>
+            <input type="text" name="nameAttendee" id="nameAttendee"><br/>
+            <br/>
+            <label for="clientIpAddress">IP Address:</label>
+            <span th:text="${clientIpAddress}" id="clientIpAddress"></span><br>
 
-    <h2>Choose an event:</h2>
-    <form action="/eventBooking" th:method="post" >
-        <div th:each="event : ${events}">
-            <label>
-                <input type="radio" th:value="${event.name}" name="eventName">
-                <span>
-                   <b>Name: </b>  <span th:text="${event.name}"></span><br>
-                   <b>Description: </b>  <span th:text="${event.description}"></span><br>
-                   <b>Rating: </b>  <span th:text="${event.popularityScore}"></span>
-                </span>
-                </br>
-            </label>
+            <br/>
 
-        </div>
-
-
-        <h2>Choose number of tickets:</h2>
-        <input type="number" name="numTickets" min="1" max="10"><br/>
-        <br/>
-
-        <span>Name of booking:</span>
-        <input type="text" name="nameAttendee"><br/>
-        <br/>
-        <span>Ip Address:</span>
-        <span th:text="${clientIpAddress}"></span><br>
-        <br/>
-
-        <input type="submit" value="Submit">
-    </form>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+        The event is not found.
+    </div>
 </main>
 </body>
 </html>

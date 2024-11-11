@@ -3,6 +3,7 @@ package mk.ukim.finki.wp.lab.repository;
 
 import mk.ukim.finki.wp.lab.bootstrap.DataHolder;
 import mk.ukim.finki.wp.lab.model.Event;
+import mk.ukim.finki.wp.lab.model.Location;
 import mk.ukim.finki.wp.lab.model.SavedBooking;
 import org.springframework.stereotype.Repository;
 
@@ -62,5 +63,23 @@ public class EventRepository {
         if (!bookingExists) {
             savedBookings.add(new SavedBooking(eventName, attendeeName, tickets));
         }
+    }
+
+    public void deleteById(Long id){
+        DataHolder.eventList.removeIf(i -> i.getId().equals(id));
+    }
+
+    public Optional<Event> findById(Long id){
+        return DataHolder.eventList.stream()
+                .filter(i->i.getId().equals(id))
+                .findFirst();
+    }
+
+
+    public Optional<Event> save(String name, String description, Double popularityScore, Location location){
+        DataHolder.eventList.removeIf(i-> i.getName().equals(name));
+        Event event = new Event(name, description, popularityScore, location);
+        DataHolder.eventList.add(event);
+        return Optional.of(event);
     }
 }

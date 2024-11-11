@@ -1,12 +1,14 @@
 package mk.ukim.finki.wp.lab.service.impl;
 
 import mk.ukim.finki.wp.lab.model.Event;
+import mk.ukim.finki.wp.lab.model.Location;
 import mk.ukim.finki.wp.lab.model.SavedBooking;
 import mk.ukim.finki.wp.lab.repository.EventRepository;
 import mk.ukim.finki.wp.lab.service.EventService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -28,6 +30,8 @@ public class EventServiceImpl implements EventService {
 
 
 
+
+
     @Override
     public void addBooking(String eventName, String attendeeName, int tickets) {
         try {
@@ -37,5 +41,21 @@ public class EventServiceImpl implements EventService {
             throw new RuntimeException("Booking failed: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public void deleteById(Long id) {
+        eventRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Event> findById(Long id) {
+        return this.eventRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Event> save(String name, String description, Double popularityScore, Location location) {
+        return this.eventRepository.save(name, description, popularityScore, location);
+    }
+
 
 }

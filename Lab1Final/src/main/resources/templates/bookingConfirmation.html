@@ -2,49 +2,118 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>Booking - Confirmation</title>
+    <title>Event Booking - Booking Form</title>
     <style type="text/css">
         body {
             width: 800px;
             margin: auto;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
         }
-        table {
-            width:100%;
+
+        header h1 {
+            text-align: center;
+            color: #8a6e58;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
         }
-        table, td, th {
-            border: 1px solid black;
-            padding: 3px 2px;
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
+        .form-container label {
+            color: #8a6e58;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="number"],
+        .form-container input[type="submit"] {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 10px 0;
+            border: 2px solid #8a6e58;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #fff;
+        }
+
+        .form-container input[type="submit"] {
+            background-color: #8a6e58;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container input[type="submit"]:hover {
+            background-color: #7a5b45;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-actions a {
+            text-decoration: none;
+        }
+
+        .event-info {
+            background-color: #faf9f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .event-info b {
+            color: #8a6e58;
+        }
+
     </style>
 </head>
 <body>
-<section>
-    <header>
-        <h1>Event Booking Page - Booking Confirmation</h1>
-    </header>
-    <table>
-        <tr>
-            <th colspan="2">Your Booking Status</th>
-        </tr>
-        <tr>
-            <td><b>Attendee Name</b></td>
-            <td th:text="${booking.attendeeName}"></td>
-        </tr>
-        <tr>
-            <td><b>Client IP Address</b></td>
-            <td th:text="${booking.attendeeAddress}"></td>
-        </tr>
-        <tr>
-            <td><b>Booking for Event</b></td>
-            <td th:text="${booking.eventName}"></td>
-        </tr>
-        <tr>
-            <td><b>Number of tickets</b></td>
-            <td th:text="${booking.numberOfTickets}"></td>
-        </tr>
-    </table>
+<header>
+    <h1>Event Booking Page - Booking Form</h1>
+</header>
 
+<main>
+    <div class="form-container">
+        <h2>Choose an Event</h2>
+        <form action="/eventBooking" method="post">
+            <div th:each="event : ${events}">
+                <div class="event-info">
+                    <b>Name:</b> <span th:text="${event.name}"></span><br>
+                    <b>Description:</b> <span th:text="${event.description}"></span><br>
+                    <b>Rating:</b> <span th:text="${event.popularityScore}"></span><br>
+                    <b>Location:</b> <span th:text="${event.location.name}"></span><br>
+                </div>
 
-</section>
+                <label>
+                    <input type="radio" th:value="${event.name}" name="eventName">
+                    Choose this event
+                </label>
+            </div>
+
+            <h2>Enter Your Details</h2>
+            <label for="numTickets">Number of Tickets:</label>
+            <input type="number" name="numTickets" id="numTickets" min="1" max="10" required><br/>
+
+            <label for="nameAttendee">Your Name:</label>
+            <input type="text" name="nameAttendee" id="nameAttendee" required><br/>
+
+            <label for="attendeeIpAddress">Your IP Address:</label>
+            <span th:text="${clientIpAddress}" id="attendeeIpAddress"></span><br/>
+
+            <input type="submit" value="Submit Booking">
+        </form>
+    </div>
+</main>
+
 </body>
 </html>

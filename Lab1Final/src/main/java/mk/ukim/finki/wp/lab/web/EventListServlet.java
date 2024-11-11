@@ -21,7 +21,7 @@ import java.util.List;
 
 import static mk.ukim.finki.wp.lab.bootstrap.DataHolder.eventList;
 
-@WebServlet(name="eventlist-servlet",urlPatterns = "/*")
+@WebServlet(name="eventlist-servlet",urlPatterns = "/eventservlet")
 public class EventListServlet extends HttpServlet {
     private final  EventService eventService;
 
