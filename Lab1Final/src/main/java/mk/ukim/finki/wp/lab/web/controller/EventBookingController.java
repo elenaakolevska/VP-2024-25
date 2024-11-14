@@ -1,45 +1,59 @@
 package mk.ukim.finki.wp.lab.web.controller;
 
-
+import jakarta.servlet.http.HttpServletRequest;
+import mk.ukim.finki.wp.lab.model.Event;
 import mk.ukim.finki.wp.lab.model.EventBooking;
+import mk.ukim.finki.wp.lab.repository.EventBookingRepository;
 import mk.ukim.finki.wp.lab.service.EventBookingService;
 import mk.ukim.finki.wp.lab.service.EventService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
 @Controller
 @RequestMapping("/eventBooking")
 public class EventBookingController {
 
-    private final EventBookingService bookingService;
     private final EventService eventService;
+    private final EventBookingRepository eventBookingRepository;
+    private final EventBookingService eventBookingService;
 
-    public EventBookingController(EventBookingService bookingService, EventService eventService) {
-        this.bookingService = bookingService;
+    public EventBookingController(EventService eventService, EventBookingRepository eventBookingRepository, EventBookingService eventBookingService) {
         this.eventService = eventService;
-    }
-
-    @GetMapping
-    public String showEventBookingForm(Model model) {
-        // Fetch the events to display them in the form
-        model.addAttribute("events", eventService.listAll());
-        // Add a placeholder for client IP
-        model.addAttribute("clientIpAddress", "192.168.0.1"); // Just an example, in reality, you fetch it dynamically
-        return "eventBooking"; // The name of your Thymeleaf template (eventBooking.html)
+        this.eventBookingRepository = eventBookingRepository;
+        this.eventBookingService = eventBookingService;
     }
 
     @PostMapping
     public String processBooking(@RequestParam String eventName,
-                                 @RequestParam int numTickets,
                                  @RequestParam String nameAttendee,
-                                 @RequestParam String attendeeIpAddress,
+                                 @RequestParam String clientIpAddress,
+                                 @RequestParam int numTickets,
+                                 @RequestParam(required = false) String error,
                                  Model model) {
-        // Process the booking
-        EventBooking booking = bookingService.placeBooking(eventName, nameAttendee, attendeeIpAddress, numTickets);
+        if (error != null && !error.isEmpty()) {
+            model.addAttribute("hasError", true);
+            model.addAttribute("error", error);
+            return "listEvents";
+        }
 
-        // Pass the booking to the confirmation page
-        model.addAttribute("booking", booking);
+        System.out.println("Booking Details:");
+        System.out.println("Event Name: " + eventName);
+        System.out.println("Attendee Name: " + nameAttendee);
+        System.out.println("Attendee Address: " + clientIpAddress);
+        System.out.println("Number of Tickets: " + numTickets);
 
-        return "bookingConfirmation"; // The name of the confirmation page (bookingConfirmation.html)
+        EventBooking eventBooking = eventBookingService.placeBooking(eventName, nameAttendee, clientIpAddress, numTickets);
+        eventBookingRepository.bookings.add(eventBooking);
+
+        List<EventBooking> allBookings = eventBookingService.filterBookings(nameAttendee);
+        model.addAttribute("booking", eventBooking);
+        model.addAttribute("allBookings", allBookings);
+
+        return "bookingConfirmation";
     }
+
 }

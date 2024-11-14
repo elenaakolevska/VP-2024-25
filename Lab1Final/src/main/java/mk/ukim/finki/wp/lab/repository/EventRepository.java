@@ -76,10 +76,33 @@ public class EventRepository {
     }
 
 
+
     public Optional<Event> save(String name, String description, Double popularityScore, Location location){
-        DataHolder.eventList.removeIf(i-> i.getName().equals(name));
+        if(location==null){
+            throw new IllegalArgumentException();
+        }
         Event event = new Event(name, description, popularityScore, location);
+        DataHolder.eventList.removeIf(i-> i.getName().equals(event.getName()));
         DataHolder.eventList.add(event);
         return Optional.of(event);
+    }
+
+
+    public List<Event> findByName(String name) {
+        return DataHolder.eventList.stream()
+                .filter(event -> event.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+    }
+
+    public List<Event> findByMinRating(Double rating) {
+        return DataHolder.eventList.stream()
+                .filter(event -> event.getPopularityScore() >= rating)
+                .collect(Collectors.toList());
+    }
+
+    public List<Event> findByNameAndMinRating(String name, Double rating) {
+        return DataHolder.eventList.stream()
+                .filter(event -> event.getName().equalsIgnoreCase(name) && event.getPopularityScore() >= rating)
+                .collect(Collectors.toList());
     }
 }

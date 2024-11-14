@@ -28,10 +28,6 @@ public class EventServiceImpl implements EventService {
         return eventRepository.searchEvents(text,popularity);
     }
 
-
-
-
-
     @Override
     public void addBooking(String eventName, String attendeeName, int tickets) {
         try {
@@ -53,8 +49,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Optional<Event> save(String name, String description, Double popularityScore, Location location) {
-        return this.eventRepository.save(name, description, popularityScore, location);
+    public Optional<Event> save(String name, String description, Double popularityScore, Location id) {
+        return eventRepository.save(name, description, popularityScore, id);
+    }
+    @Override
+    public List<Event> findByName(String name) {
+        return eventRepository.findByName(name);
+    }
+
+    @Override
+    public List<Event> findByMinRating(Double rating) {
+        return eventRepository.findByMinRating(rating);
+    }
+
+    @Override
+    public List<Event> findByNameAndMinRating(String name, Double rating) {
+        return eventRepository.findByNameAndMinRating(name, rating);
     }
 
 

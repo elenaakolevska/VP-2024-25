@@ -22,24 +22,38 @@ public class EventController {
     }
 
     @GetMapping
-    public String getEventsPage(@RequestParam(required = false) String error, Model model, HttpServletRequest req) {
+    public String getEventsPage(@RequestParam(required = false) String searchName,
+                                @RequestParam(required = false) Double minRating,
+                                @RequestParam(required = false) String error,
+                                Model model, HttpServletRequest req) {
+
         if (error != null && !error.isEmpty()) {
             model.addAttribute("hasError", true);
             model.addAttribute("error", error);
         }
 
-        List<Event> events = this.eventService.listAll();
+        List<Event> events;
+        double minRatingValue = minRating != null && !minRating.isNaN() ? Double.parseDouble(String.valueOf(minRating)) : 0.0;
+
+        if ((searchName == null || searchName.isEmpty()) && minRatingValue == 0.0) {
+            events = eventService.listAll();
+        } else {
+            events = eventService.searchEvents(searchName, minRatingValue);
+        }
+
         model.addAttribute("events", events);
-        model.addAttribute("clientIpAddress",req.getRemoteAddr());
+        model.addAttribute("clientIpAddress", req.getRemoteAddr());
         return "listEvents";
     }
+
 
     @GetMapping("/edit/{id}")
     public String editProductPage(@PathVariable Long id, Model model) {
         if (this.eventService.findById(id).isPresent()) {
             Event event = this.eventService.findById(id).get();
+            List<Location> locations = locationService.findAll();
+            model.addAttribute("locations", locations);
             model.addAttribute("event", event);
-            model.addAttribute("locations", locationService.findAll());
             return "add-event";
         }
         return "redirect:/events?error=EventNotFound";
@@ -48,8 +62,10 @@ public class EventController {
     @GetMapping("/add-event")
     public String addEvent(Model model) {
         List<Event> events = this.eventService.listAll();
+        List<Location> locations = locationService.findAll();
         model.addAttribute("events", events);
-        model.addAttribute("locations", locationService.findAll());
+        model.addAttribute("locations", locations);
+
         return "add-event";
     }
 
@@ -58,13 +74,15 @@ public class EventController {
                             @RequestParam String description,
                             @RequestParam Double popularityScore,
                             @RequestParam Long locationId) {
-        Location location = locationService.findById(locationId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid location ID"));
-        eventService.save(name, description, popularityScore, location);
+        Location location = locationService.findById(locationId).orElse(null);
+        if (location == null) {
+            return "redirect:/events?error=InvalidLocation";
+        }
+        this.eventService.save(name, description, popularityScore, location);
         return "redirect:/events";
     }
 
-    @DeleteMapping("/delete/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable Long id) {
         this.eventService.deleteById(id);
         return "redirect:/events";

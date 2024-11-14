@@ -158,6 +158,28 @@
 
         .btn-add-event i {
             margin-right: 5px;}
+        button[type="submit"] {
+            width: auto;
+            padding: 0.8rem 1.2rem;
+            margin: 10px 0;
+            background-color: #8a6e58;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #7a5b45;
+            transform: scale(1.05);
+        }
+
+        button[type="submit"]:active {
+            background-color: #6b4e37;
+            transform: scale(1);
+        }
 
 
     </style>
@@ -180,25 +202,31 @@
 </header>
 <main>
     <div class="form-container">
+        <div th:if="${param.error}" class="alert alert-danger" role="alert">
+            The event is not found.
+        </div>
         <h2>Search for an Event</h2>
-        <form action="/" method="get">
-            <label for='search'>By event name:</label>
-            <input type="text" name="searchName" id="search" placeholder="Search an event" th:value="${searchName != null ? searchName : ''}">
-            <label for='minRating'>By minimum rating:</label>
-            <input type='number' name="minRating" id="minRating" placeholder="Search by rating" th:value="${minRating != null ? minRating : ''}">
-            <input type="submit" value="Search">
+        <form action="/events" method="get">
+            <label for='search'>Search event:</label>
+            <input type="text" name="searchName" id="search" placeholder="Search an event">
+            <label for='minRating'>Search by minimum rating:</label>
+            <input type='number' name="minRating" id="minRating" placeholder="Search by rating">
+            <button type="submit">Search</button>
         </form>
+
+    </div>
+    <div>
+        <a th:href="@{'/events/add-event'}" class="btn btn-sm btn-add-event">
+            <i class="fa fa-plus"></i> Add Event
+        </a>
     </div>
 
-    <a th:href="@{'/events/add-event'}" class="btn btn-sm btn-add-event">
-        <i class="fa fa-plus"></i> Add Event
-    </a>
     <div class="form-container">
         <h2>Choose an Event:</h2>
-        <form action="/eventBooking" th:method="post">
+        <form th:action="@{/eventBooking}" th:method="post">
             <div th:each="event : ${events}">
                 <label>
-                    <input type="radio" th:value="${event.name}" name="eventName">
+                    <input type="radio" th:value="${event.name}" name="eventName" required>
                     <div class="event-info">
                         <b>Name:</b> <span th:text="${event.name}"></span><br>
                         <b>Description:</b> <span th:text="${event.description}"></span><br>
@@ -207,35 +235,35 @@
                     </div>
 
                     <div class="form-actions">
-                        <a th:href="@{'/events/edit/{id}' (id=${event.getId()})}" class="btn btn-sm btn-edit">
+
+                        <a th:href="@{'/events/edit/{id}' (id=${event.id})}" class="btn btn-sm btn-edit">
+                            <input type="hidden" name="id" th:value="${event.id}">
                             <i class="fa fa-edit"></i> Edit
                         </a>
-                        <form th:action="@{'/events/delete/{id}' (id=${event.getId()})}" th:method="delete" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-delete-custom">
-                                <i class="fa fa-trash"></i> Delete
-                            </button>
-                        </form>
+                        <a th:href="@{'/events/delete/{id}' (id=${event.id})}" class="btn btn-sm btn-edit btn-delete">
+                            <i class="fa fa-trash"></i> Delete
+                        </a>
                     </div>
                 </label>
             </div>
 
             <h2>Choose Number of Tickets:</h2>
-            <input type="number" name="numTickets" min="1" max="10"><br/>
+            <input type="number" name="numTickets" min="1" max="10" required><br/>
             <br/>
             <label for="nameAttendee">Name of booking:</label>
             <input type="text" name="nameAttendee" id="nameAttendee"><br/>
             <br/>
             <label for="clientIpAddress">IP Address:</label>
-            <span th:text="${clientIpAddress}" id="clientIpAddress"></span><br>
+            <span th:text="${clientIpAddress}" id="clientIpAddress"></span>
+            <input type="hidden" name="clientIpAddress" th:value="${clientIpAddress}">
+
 
             <br/>
 
             <input type="submit" value="Submit">
         </form>
     </div>
-    <div th:if="${param.error}" class="alert alert-danger" role="alert">
-        The event is not found.
-    </div>
+
 </main>
 </body>
 </html>
