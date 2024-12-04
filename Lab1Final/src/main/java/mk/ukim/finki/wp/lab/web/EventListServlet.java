@@ -25,8 +25,6 @@ import static mk.ukim.finki.wp.lab.bootstrap.DataHolder.eventList;
 public class EventListServlet extends HttpServlet {
     private final  EventService eventService;
 
-    //    process thymeleaf templates
-//    This enables server-side generation of HTML with data injected into the view.
     private final SpringTemplateEngine springTemplateEngine;
 
     public EventListServlet(EventService eventService, SpringTemplateEngine springTemplateEngine) {

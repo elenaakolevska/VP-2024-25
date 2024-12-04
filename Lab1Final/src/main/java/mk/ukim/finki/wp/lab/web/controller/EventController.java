@@ -1,6 +1,8 @@
 package mk.ukim.finki.wp.lab.web.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import mk.ukim.finki.wp.lab.model.Comment;
 import mk.ukim.finki.wp.lab.model.Event;
 import mk.ukim.finki.wp.lab.model.Location;
 import mk.ukim.finki.wp.lab.service.EventService;
@@ -10,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+
 @Controller
 @RequestMapping("/events")
 public class EventController {
@@ -46,7 +50,6 @@ public class EventController {
         return "listEvents";
     }
 
-
     @GetMapping("/edit/{id}")
     public String editProductPage(@PathVariable Long id, Model model) {
         if (this.eventService.findById(id).isPresent()) {
@@ -82,10 +85,39 @@ public class EventController {
         return "redirect:/events";
     }
 
+
+
+    @GetMapping("/details/{id}")
+    public String showEventDetails(@PathVariable Long id, Model model) {
+        Optional<Event> optionalEvent = eventService.findById(id);
+        if (optionalEvent.isPresent()) {
+            Event event = optionalEvent.get();
+            model.addAttribute("event", event);
+            model.addAttribute("comments", event.getComments());
+            return "eventDetails";
+        } else {
+            return "redirect:/events?error=Event not found";
+        }
+    }
+
+
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable Long id) {
         this.eventService.deleteById(id);
         return "redirect:/events";
+    }
+
+    @PostMapping("/events/{eventId}/comments")
+    public String addComment(@PathVariable Long eventId,
+                             @RequestParam String commentContent,
+                             @RequestParam String userName,
+                             HttpSession session) {
+        try {
+            eventService.addCommentToEvent(eventId, commentContent, userName);
+            return "redirect:/events/details/" + eventId;
+        } catch (Exception e) {
+            return "redirect:/events/details/" + eventId + "?error=Error adding comment";
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package mk.ukim.finki.wp.lab.service;
 
+import jakarta.servlet.http.HttpSession;
 import mk.ukim.finki.wp.lab.model.Event;
 import mk.ukim.finki.wp.lab.model.Location;
 import mk.ukim.finki.wp.lab.model.SavedBooking;
@@ -15,9 +16,9 @@ public interface EventService {
     void  deleteById(Long id);
     Optional<Event> findById(Long id);
     Optional<Event> save(String name, String description, Double popularityScore, Location location);
-    public List<Event> findByName(String name);
-
-
-    public List<Event> findByMinRating(Double rating);
-    public List<Event> findByNameAndMinRating(String name, Double rating);
+     List<Event> findByName(String name);
+     List<Event> findByMinRating(Double rating);
+     List<Event> findByNameAndMinRating(String name, Double rating);
+    public void addCommentToEvent(Long eventId, String username, String commentContent);
+    List<String> getCommentsByEventId(Long eventId);
     }

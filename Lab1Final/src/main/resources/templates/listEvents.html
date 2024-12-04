@@ -243,6 +243,10 @@
                         <a th:href="@{'/events/delete/{id}' (id=${event.id})}" class="btn btn-sm btn-edit btn-delete">
                             <i class="fa fa-trash"></i> Delete
                         </a>
+                        <a th:href="@{'/events/details/{id}' (id=${event.id})}" class="btn btn-sm btn-details">
+                            <i class="fa fa-eye"></i> See Details
+                        </a>
+
                     </div>
                 </label>
             </div>

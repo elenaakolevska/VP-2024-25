@@ -1,12 +1,13 @@
 package mk.ukim.finki.wp.lab.service.impl;
 
+import jakarta.servlet.http.HttpSession;
+import mk.ukim.finki.wp.lab.model.Comment;
 import mk.ukim.finki.wp.lab.model.Event;
 import mk.ukim.finki.wp.lab.model.Location;
 import mk.ukim.finki.wp.lab.model.SavedBooking;
 import mk.ukim.finki.wp.lab.repository.EventRepository;
 import mk.ukim.finki.wp.lab.service.EventService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -67,5 +68,16 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findByNameAndMinRating(name, rating);
     }
 
+    @Override
+    public void addCommentToEvent(Long eventId, String username, String commentContent) {
+        eventRepository.addCommentToEvent(eventId, username, commentContent);
+    }
+
+    @Override
+    public List<String> getCommentsByEventId(Long eventId) {
+        return eventRepository.findById(eventId)
+                .map(Event::getComments)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found."));
+    }
 
 }

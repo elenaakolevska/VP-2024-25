@@ -17,6 +17,8 @@ public class Event {
    private int ticketCount;
    private Long id;
    private Location location;
+   private List<String> comments;
+
 
    public Event(String name, String description, double popularityScore, int ticketCount, Location location) {
       this.name = name;
@@ -35,5 +37,16 @@ public class Event {
       Random random = new Random();
       this.id = random.nextLong();
       this.location = location;
+      this.comments = new ArrayList<>();
+
+   }
+
+   public void addComment(String comment) {
+      this.comments.add(comment);
+   }
+
+
+   public List<String> getComments() {
+      return comments;
    }
 }
