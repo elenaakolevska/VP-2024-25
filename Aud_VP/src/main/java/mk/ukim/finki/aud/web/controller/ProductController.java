@@ -35,7 +35,8 @@ public class ProductController {
 
         List<Product> products = this.productService.findAll();
         model.addAttribute("products", products);
-        return "products";
+        model.addAttribute("bodyContent", "products");
+        return "master-template";
     }
 
     //  /products/77        77 e path variable
@@ -84,6 +85,7 @@ public class ProductController {
         this.productService.save(name, price, quantity, category, manufacturer);
         return "redirect:/products";
     }
+
 
 
 }

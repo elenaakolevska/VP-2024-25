@@ -1,13 +1,17 @@
 package mk.ukim.finki.aud.service.impl;
 
+import jakarta.transaction.Transactional;
 import mk.ukim.finki.aud.model.Category;
 import mk.ukim.finki.aud.model.Manufacturer;
 import mk.ukim.finki.aud.model.Product;
 import mk.ukim.finki.aud.model.exceptions.CategoryNotFoundException;
 import mk.ukim.finki.aud.model.exceptions.ManufacturerNotFoundException;
-import mk.ukim.finki.aud.repository.InMemoryCategoryRepository;
-import mk.ukim.finki.aud.repository.InMemoryManufacturerRepository;
-import mk.ukim.finki.aud.repository.InMemoryProductRepository;
+import mk.ukim.finki.aud.repository.impl.InMemoryCategoryRepository;
+import mk.ukim.finki.aud.repository.impl.InMemoryManufacturerRepository;
+import mk.ukim.finki.aud.repository.impl.InMemoryProductRepository;
+import mk.ukim.finki.aud.repository.jpa.CategoryRepository;
+import mk.ukim.finki.aud.repository.jpa.ManufacturerRepository;
+import mk.ukim.finki.aud.repository.jpa.ProductRepository;
 import mk.ukim.finki.aud.service.ProductService;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +21,13 @@ import java.util.Optional;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private final InMemoryProductRepository productRepository;
-    private final InMemoryCategoryRepository categoryRepository;
-    private final InMemoryManufacturerRepository manufacturerRepository;
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final ManufacturerRepository manufacturerRepository;
 
-    public ProductServiceImpl(InMemoryProductRepository productRepository,
-                              InMemoryCategoryRepository categoryRepository,
-                              InMemoryManufacturerRepository manufacturerRepository) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              CategoryRepository categoryRepository,
+                              ManufacturerRepository manufacturerRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.manufacturerRepository = manufacturerRepository;
@@ -45,14 +49,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Optional<Product> save(String name, Double price, Integer quantity, Long categoryId, Long manufacturerId) {
         Category category = this.categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
-        Manufacturer manufacturer = this.manufacturerRepository
-                .findById(manufacturerId)
-                .orElseThrow(()-> new ManufacturerNotFoundException(manufacturerId));
+        Manufacturer manufacturer = this.manufacturerRepository.findById(manufacturerId)
+                .orElseThrow(() -> new ManufacturerNotFoundException(manufacturerId));
 
-        return this.productRepository.save(name, price, quantity, category, manufacturer);
+        Product product = new Product(name, price, quantity, category, manufacturer);
+        this.productRepository.deleteByName(name);
+        return Optional.of(this.productRepository.save(product));
+
     }
 
     @Override

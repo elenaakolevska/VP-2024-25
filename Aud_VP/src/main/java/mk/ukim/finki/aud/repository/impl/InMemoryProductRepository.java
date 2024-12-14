@@ -1,4 +1,4 @@
-package mk.ukim.finki.aud.repository;
+package mk.ukim.finki.aud.repository.impl;
 
 import mk.ukim.finki.aud.bootstrap.DataHolder;
 import mk.ukim.finki.aud.model.Category;

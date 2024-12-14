@@ -22,8 +22,9 @@ public class LoginController {
 
     //@RequestMapping(method = RequestMethod.GET, value = "")
     @GetMapping
-    public String getLoginPage(){
-        return "login";
+    public String getLoginPage(Model model){
+       model.addAttribute("bodyContent", "login");
+        return "master-template";
     }
     @PostMapping
     public String login(HttpServletRequest request, Model model){
