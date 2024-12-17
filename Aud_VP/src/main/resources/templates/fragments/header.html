@@ -32,6 +32,15 @@
                             </button>
                         </div>
                     </div>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+        <span th:if="${#authorization.expression('isAuthenticated()')}"
+              th:text="${#authentication.name}"></span>
+                        </a>
+                    </li>
+
+
+
                     <a class="btn btn-success btn-sm ml-3" href="/shopping-cart">
                         <i class="fa fa-shopping-cart"></i> Cart
                     </a>

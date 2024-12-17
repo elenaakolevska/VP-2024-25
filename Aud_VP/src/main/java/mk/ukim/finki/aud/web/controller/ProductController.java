@@ -6,6 +6,7 @@ import mk.ukim.finki.aud.model.Product;
 import mk.ukim.finki.aud.service.CategoryService;
 import mk.ukim.finki.aud.service.ManufacturerService;
 import mk.ukim.finki.aud.service.ProductService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -50,12 +51,15 @@ public class ProductController {
     // kategorii da ja izlistame
 
     @GetMapping("/add-form")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String addProductPage(Model model) {
         List<Category> categories = this.categoryService.listCategories();
         List<Manufacturer> manufacturers = this.manufacturerService.findAll();
         model.addAttribute("categories", categories);
         model.addAttribute("manufacturers", manufacturers);
-        return "add-product";
+        model.addAttribute("bodyContent", "add-product");
+        return "master-template";
+
     }
 
     @GetMapping("/edit-form/{id}")
@@ -68,8 +72,8 @@ public class ProductController {
             model.addAttribute("categories", categories);
             model.addAttribute("manufacturers", manufacturers);
             model.addAttribute("product", product);
-
-            return "add-product";
+            model.addAttribute("bodyContent", "add-product");
+            return "master-template";
         }
         return "redirect:/products?error=ProductNotFound";
 
