@@ -1,8 +1,10 @@
 package mk.ukim.finki.wp.lab.service.impl;
 
 import mk.ukim.finki.wp.lab.model.EventBooking;
-import mk.ukim.finki.wp.lab.repository.EventBookingRepository;
-import mk.ukim.finki.wp.lab.repository.EventRepository;
+import mk.ukim.finki.wp.lab.repository.impl.InMemoryEventBookingRepository;
+import mk.ukim.finki.wp.lab.repository.impl.InMemoryEventRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.EventBookingRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.EventRepository;
 import mk.ukim.finki.wp.lab.service.EventBookingService;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +21,10 @@ public class EventBookingServiceImpl implements EventBookingService {
         this.bookingRepository = bookingRepository;
     }
 
+
     @Override
     public EventBooking placeBooking(String eventName, String attendeeName, String attendeeAddress, int numberOfTickets) {
-        eventRepository.addBooking(eventName,attendeeName, numberOfTickets);
-        return new EventBooking(eventName, attendeeName, attendeeAddress, (long) numberOfTickets);
+        return new EventBooking(eventName,attendeeName,attendeeAddress, (long) numberOfTickets);
     }
 
     @Override

@@ -1,45 +1,45 @@
 package mk.ukim.finki.wp.lab.web.controller;
-
-import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Controller;
+import mk.ukim.finki.wp.lab.model.User;
+import mk.ukim.finki.wp.lab.model.exceptions.InvalidUserCredentialsException;
+import mk.ukim.finki.wp.lab.service.AuthService;
 import org.springframework.ui.Model;
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/login")
 public class LoginController {
 
-    private Map<String, String> users = new HashMap<>();
+    private final AuthService authService;
 
-    public LoginController() {
-        users.put("user", "password");
+    public LoginController(AuthService authService) {
+        this.authService = authService;
     }
 
-    @GetMapping("/login")
-    public String showLoginForm() {
+    @GetMapping
+    public String getLoginPage() {
         return "login";
     }
 
-    @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password, Model model, HttpSession session) {
-        if (users.containsKey(username) && users.get(username).equals(password)) {
-            session.setAttribute("user", username);
+    @PostMapping
+    public String login(HttpServletRequest request, Model model){
+
+        User user = null;
+        try{
+            user = this.authService.login(request.getParameter("username"),
+                    request.getParameter("password"));
+            request.getSession().setAttribute("user", user);
+
             return "redirect:/events";
-        } else {
-            model.addAttribute("errorMessage", "Invalid username or password");
+        }
+        catch (InvalidUserCredentialsException exception){
+            model.addAttribute("hasError", true);
+            model.addAttribute("error", exception.getMessage());
             return "login";
         }
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
     }
 }

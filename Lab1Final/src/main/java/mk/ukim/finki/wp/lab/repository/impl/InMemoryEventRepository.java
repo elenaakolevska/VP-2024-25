@@ -1,8 +1,7 @@
-package mk.ukim.finki.wp.lab.repository;
+package mk.ukim.finki.wp.lab.repository.impl;
 
 
 import mk.ukim.finki.wp.lab.bootstrap.DataHolder;
-import mk.ukim.finki.wp.lab.model.Comment;
 import mk.ukim.finki.wp.lab.model.Event;
 import mk.ukim.finki.wp.lab.model.Location;
 import mk.ukim.finki.wp.lab.model.SavedBooking;
@@ -14,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-public class EventRepository {
+public class InMemoryEventRepository {
     private final List<SavedBooking> savedBookings = new ArrayList<>();
 
     public List<Event> findAll() {
@@ -108,19 +107,19 @@ public class EventRepository {
     }
 
 
-    public void addCommentToEvent(Long eventId, String username, String commentContent) {
-        Optional<Event> eventOptional = findById(eventId);
-        if (eventOptional.isPresent()) {
-            Event event = eventOptional.get();
-
-            Comment newComment = new Comment(username, commentContent);
-            event.getComments().add(String.valueOf(newComment));
-
-            save(event.getName(), event.getDescription(), event.getPopularityScore(), event.getLocation());
-        } else {
-            throw new RuntimeException("Event not found");
-        }
-    }
+//    public void addCommentToEvent(Long eventId, String username, String commentContent) {
+//        Optional<Event> eventOptional = findById(eventId);
+//        if (eventOptional.isPresent()) {
+//            Event event = eventOptional.get();
+//
+//            Comment newComment = new Comment(username, commentContent);
+//            event.getComments().add(String.valueOf(newComment));
+//
+//            save(event.getName(), event.getDescription(), event.getPopularityScore(), event.getLocation());
+//        } else {
+//            throw new RuntimeException("Event not found");
+//        }
+//    }
 
 
 }

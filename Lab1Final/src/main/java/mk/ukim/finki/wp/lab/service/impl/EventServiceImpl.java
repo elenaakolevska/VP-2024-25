@@ -1,15 +1,13 @@
 package mk.ukim.finki.wp.lab.service.impl;
 
-import jakarta.servlet.http.HttpSession;
-import mk.ukim.finki.wp.lab.model.Comment;
 import mk.ukim.finki.wp.lab.model.Event;
 import mk.ukim.finki.wp.lab.model.Location;
-import mk.ukim.finki.wp.lab.model.SavedBooking;
-import mk.ukim.finki.wp.lab.repository.EventRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.EventRepository;
 import mk.ukim.finki.wp.lab.service.EventService;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -26,17 +24,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> searchEvents(String text,double popularity) {
-        return eventRepository.searchEvents(text,popularity);
-    }
-
-    @Override
-    public void addBooking(String eventName, String attendeeName, int tickets) {
-        try {
-            eventRepository.addBooking(eventName, attendeeName, tickets);
-        } catch (IllegalArgumentException e) {
-
-            throw new RuntimeException("Booking failed: " + e.getMessage(), e);
-        }
+        return eventRepository.findAll().stream()
+                .filter(event -> (text==null || event.getName().toLowerCase().contains(text.toLowerCase())||
+                         event.getDescription().toLowerCase().contains(text.toLowerCase()))
+                && event.getPopularityScore() >= popularity).collect(Collectors.toList());
     }
 
     @Override
@@ -50,34 +41,23 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Optional<Event> save(String name, String description, Double popularityScore, Location id) {
-        return eventRepository.save(name, description, popularityScore, id);
-    }
-    @Override
-    public List<Event> findByName(String name) {
-        return eventRepository.findByName(name);
-    }
+    public Optional<Event> save(Long id, String name, String description, Double popularityScore, Location location) {
+        Event event;
+        if (id != null) {
+            event = eventRepository.findById(id).orElse(new Event());
+        } else {
+            event = new Event();
+        }
+        event.setName(name);
+        event.setDescription(description);
+        event.setPopularityScore(popularityScore);
+        event.setLocation(location);
 
-    @Override
-    public List<Event> findByMinRating(Double rating) {
-        return eventRepository.findByMinRating(rating);
+        return Optional.of(eventRepository.save(event));
     }
-
     @Override
-    public List<Event> findByNameAndMinRating(String name, Double rating) {
-        return eventRepository.findByNameAndMinRating(name, rating);
-    }
-
-    @Override
-    public void addCommentToEvent(Long eventId, String username, String commentContent) {
-        eventRepository.addCommentToEvent(eventId, username, commentContent);
-    }
-
-    @Override
-    public List<String> getCommentsByEventId(Long eventId) {
-        return eventRepository.findById(eventId)
-                .map(Event::getComments)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found."));
+    public List<Event> findAllByLocationId(Long locationId) {
+        return eventRepository.findAllByLocation_Id(locationId);
     }
 
 }

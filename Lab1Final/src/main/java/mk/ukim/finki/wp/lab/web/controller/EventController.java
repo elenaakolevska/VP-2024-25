@@ -7,6 +7,7 @@ import mk.ukim.finki.wp.lab.model.Event;
 import mk.ukim.finki.wp.lab.model.Location;
 import mk.ukim.finki.wp.lab.service.EventService;
 import mk.ukim.finki.wp.lab.service.LocationService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +28,11 @@ public class EventController {
 
     @GetMapping
     public String getEventsPage(@RequestParam(required = false) String searchName,
-                                @RequestParam(required = false) Double minRating,
+                                @RequestParam(required = false) String minRating,
                                 @RequestParam(required = false) String error,
-                                Model model, HttpServletRequest req) {
+                                Model model, HttpServletRequest req, HttpSession session) {
+
+        boolean isAuthenticated = session.getAttribute("user") != null;
 
         if (error != null && !error.isEmpty()) {
             model.addAttribute("hasError", true);
@@ -37,19 +40,23 @@ public class EventController {
         }
 
         List<Event> events;
-        double minRatingValue = minRating != null && !minRating.isNaN() ? Double.parseDouble(String.valueOf(minRating)) : 0.0;
+        List<Location> locations = locationService.findAll();
 
-        if ((searchName == null || searchName.isEmpty()) && minRatingValue == 0.0) {
+        if ((searchName == null || searchName.isEmpty()) && (minRating == null || minRating.isEmpty())) {
             events = eventService.listAll();
         } else {
-            events = eventService.searchEvents(searchName, minRatingValue);
+            double minRatingP = minRating != null && !minRating.isEmpty() ? Double.parseDouble(minRating) : 0.0;
+            events = eventService.searchEvents(searchName, minRatingP);
         }
 
         model.addAttribute("events", events);
         model.addAttribute("clientIpAddress", req.getRemoteAddr());
+        model.addAttribute("locations", locations);
+        model.addAttribute("isAuthenticated", isAuthenticated);  // Додадено во моделот
+
         return "listEvents";
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/edit/{id}")
     public String editProductPage(@PathVariable Long id, Model model) {
         if (this.eventService.findById(id).isPresent()) {
@@ -61,7 +68,7 @@ public class EventController {
         }
         return "redirect:/events?error=EventNotFound";
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/add-event")
     public String addEvent(Model model) {
         List<Event> events = this.eventService.listAll();
@@ -71,9 +78,10 @@ public class EventController {
 
         return "add-event";
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
-    public String saveEvent(@RequestParam String name,
+    public String saveEvent(@RequestParam(required = false) Long id,
+                            @RequestParam String name,
                             @RequestParam String description,
                             @RequestParam Double popularityScore,
                             @RequestParam Long locationId) {
@@ -81,10 +89,9 @@ public class EventController {
         if (location == null) {
             return "redirect:/events?error=InvalidLocation";
         }
-        this.eventService.save(name, description, popularityScore, location);
+        this.eventService.save(id, name, description, popularityScore, location);
         return "redirect:/events";
     }
-
 
 
     @GetMapping("/details/{id}")
@@ -93,31 +100,25 @@ public class EventController {
         if (optionalEvent.isPresent()) {
             Event event = optionalEvent.get();
             model.addAttribute("event", event);
-            model.addAttribute("comments", event.getComments());
             return "eventDetails";
         } else {
             return "redirect:/events?error=Event not found";
         }
     }
-
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable Long id) {
-        this.eventService.deleteById(id);
-        return "redirect:/events";
+    public String deleteEvent(@PathVariable Long id) {
+        if (eventService.findById(id).isPresent()) {
+            this.eventService.deleteById(id);
+            return "redirect:/events";
+        } else return "redirect:/events?error=Event not found";
     }
 
-    @PostMapping("/events/{eventId}/comments")
-    public String addComment(@PathVariable Long eventId,
-                             @RequestParam String commentContent,
-                             @RequestParam String userName,
-                             HttpSession session) {
-        try {
-            eventService.addCommentToEvent(eventId, commentContent, userName);
-            return "redirect:/events/details/" + eventId;
-        } catch (Exception e) {
-            return "redirect:/events/details/" + eventId + "?error=Error adding comment";
-        }
+    @GetMapping("/by-location")
+    public String getEventsByLocation(@RequestParam Long locationId, Model model) {
+        List<Event> events = eventService.findAllByLocationId(locationId);
+        model.addAttribute("events", events);
+        model.addAttribute("locations", locationService.findAll());
+        return "listEvents";
     }
-
 }
